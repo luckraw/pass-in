@@ -1,7 +1,9 @@
 package com.luckraw.passin.dto.event;
 
 import com.luckraw.passin.domain.event.Event;
+import lombok.Getter;
 
+@Getter
 public class EventResponseDTO {
 
     EventDetailDTO event;
