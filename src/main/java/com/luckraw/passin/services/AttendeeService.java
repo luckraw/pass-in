@@ -1,6 +1,7 @@
 package com.luckraw.passin.services;
 
 import com.luckraw.passin.domain.attendee.Attendee;
+import com.luckraw.passin.domain.attendee.exceptions.AttendeeAlreadyExistException;
 import com.luckraw.passin.domain.checkin.CheckIn;
 import com.luckraw.passin.dto.attendee.AttendeeDetails;
 import com.luckraw.passin.dto.attendee.AttendeesListResponseDTO;
@@ -35,5 +36,16 @@ public class AttendeeService {
         }).toList();
 
         return new AttendeesListResponseDTO(attendeeDetails);
+    }
+
+    public void verifyAttendeeSubscription(String email, String eventId) {
+        Optional<Attendee> isAttendeeRegistered = this.attendeeRepository.findByEventIdAndEmail(eventId, email);
+
+        if (isAttendeeRegistered.isPresent()) throw new AttendeeAlreadyExistException("Attendee is already registered");
+    }
+
+    public Attendee registerAttendee(Attendee newAttendee) {
+        this.attendeeRepository.save(newAttendee);
+        return newAttendee;
     }
 }
