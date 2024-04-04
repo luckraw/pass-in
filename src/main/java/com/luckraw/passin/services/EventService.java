@@ -2,6 +2,7 @@ package com.luckraw.passin.services;
 
 import com.luckraw.passin.domain.attendee.Attendee;
 import com.luckraw.passin.domain.event.Event;
+import com.luckraw.passin.domain.event.exceptions.EventNotFoundException;
 import com.luckraw.passin.dto.event.EventIdDTO;
 import com.luckraw.passin.dto.event.EventRequestDTO;
 import com.luckraw.passin.dto.event.EventResponseDTO;
@@ -21,7 +22,7 @@ public class EventService {
     private final AttendeeRepository attendeeRepository;
 
     public EventResponseDTO getEventDetail(String eventId) {
-        Event event = this.eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found with ID:" + eventId));
+        Event event = this.eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event not found with ID:" + eventId));
         List<Attendee> attendeeList = this.attendeeRepository.findByEventId(eventId);
         return new EventResponseDTO(event, attendeeList.size());
     }
