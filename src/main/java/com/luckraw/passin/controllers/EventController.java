@@ -1,6 +1,8 @@
 package com.luckraw.passin.controllers;
 
 import com.luckraw.passin.domain.event.Event;
+import com.luckraw.passin.dto.attendee.AttendeeIdDTO;
+import com.luckraw.passin.dto.attendee.AttendeeRequestDTO;
 import com.luckraw.passin.dto.attendee.AttendeesListResponseDTO;
 import com.luckraw.passin.dto.event.EventIdDTO;
 import com.luckraw.passin.dto.event.EventRequestDTO;
@@ -35,10 +37,21 @@ public class EventController {
         return ResponseEntity.created(uri).body(eventIdDTO);
     }
 
+    @PostMapping("/{eventId}/attendees")
+    public ResponseEntity<AttendeeIdDTO> registerParticipant(@PathVariable String eventId, @RequestBody AttendeeRequestDTO body, UriComponentsBuilder uriComponentsBuilder) {
+        AttendeeIdDTO attendeeIdDTO = this.eventService.registerAttendeeOnEvent(eventId, body);
+
+        var uri = uriComponentsBuilder.path("/attendees/{attendeeId}/badge").buildAndExpand(attendeeIdDTO.attendeeId()).toUri();
+
+        return ResponseEntity.created(uri).body(attendeeIdDTO);
+    }
+
     @GetMapping("/attendees/{id}")
     public ResponseEntity<AttendeesListResponseDTO> getEventAttendees(@PathVariable String id) {
         AttendeesListResponseDTO attendeesListResponse = this.attendeeService.getEventsAttendee(id);
         return ResponseEntity.ok(attendeesListResponse);
     }
+
+
 
 }
