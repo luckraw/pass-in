@@ -2,18 +2,21 @@ package com.luckraw.passin.services;
 
 import com.luckraw.passin.domain.attendee.Attendee;
 import com.luckraw.passin.domain.attendee.exceptions.AttendeeAlreadyExistException;
+import com.luckraw.passin.domain.attendee.exceptions.AttendeeNotFoundException;
 import com.luckraw.passin.domain.checkin.CheckIn;
+import com.luckraw.passin.dto.attendee.AttendeeBadgeResponseDTO;
 import com.luckraw.passin.dto.attendee.AttendeeDetails;
 import com.luckraw.passin.dto.attendee.AttendeesListResponseDTO;
+import com.luckraw.passin.dto.attendee.AttendeeBadgeDTO;
 import com.luckraw.passin.repositories.AttendeeRepository;
 import com.luckraw.passin.repositories.CheckInRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +50,14 @@ public class AttendeeService {
     public Attendee registerAttendee(Attendee newAttendee) {
         this.attendeeRepository.save(newAttendee);
         return newAttendee;
+    }
+
+    public AttendeeBadgeResponseDTO getAttendeeBadge(String attendeeId, UriComponentsBuilder uriComponentsBuilder) {
+        Attendee attendee = this.attendeeRepository.findById(attendeeId).orElseThrow(() -> new AttendeeNotFoundException("Attendee not found with ID:" + attendeeId));
+
+        var uri = uriComponentsBuilder.path("/attendees/{attendeeId}/check-in").buildAndExpand(attendeeId).toUri().toString();
+
+        AttendeeBadgeDTO attendeeBadgeDTO = new AttendeeBadgeDTO(attendee.getName(), attendee.getEmail(), uri, attendee.getEvent().getId());
+        return new AttendeeBadgeResponseDTO(attendeeBadgeDTO);
     }
 }
